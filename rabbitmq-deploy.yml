@@ -15,6 +15,9 @@
 # under the License.
 #
 ---
+
+- include: _rabbitmq-neutron-setup.yml
+
 - hosts: FND-RMQ
   max_fail_percentage: 0
   roles:

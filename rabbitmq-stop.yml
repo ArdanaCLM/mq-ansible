@@ -15,6 +15,9 @@
 # under the License.
 #
 ---
+
+- include: _rabbitmq-neutron-setup.yml
+
 # Notice how we are controlling the last node to be left on-line this must
 # be the first node to come back online in stop.yml and start.yml
 # respectfully. This must not have the serial flag set.

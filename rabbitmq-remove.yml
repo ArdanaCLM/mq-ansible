@@ -16,6 +16,9 @@
 #
 ---
 # This will remove all RabbitMQ components installed by this playbook.
+
+- include: _rabbitmq-neutron-setup.yml
+
 - hosts: FND-RMQ
   max_fail_percentage: 0
   roles:

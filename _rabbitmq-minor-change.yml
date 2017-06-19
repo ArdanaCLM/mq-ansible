@@ -15,6 +15,9 @@
 # under the License.
 #
 ---
+
+- include: _rabbitmq-neutron-setup.yml
+
 # RabbitMQ 3.4.3-3.6.0 workaround rule.
 - hosts: FND-RMQ
   gather_facts: no
