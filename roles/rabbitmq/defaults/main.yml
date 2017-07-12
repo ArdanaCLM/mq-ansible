@@ -1,5 +1,5 @@
 
-# (c) Copyright 2015-2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2015-2017 Hewlett Packard Enterprise Development LP
 # (c) Copyright 2017 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -80,23 +80,6 @@ rabbitmq_remote_host: >
 # Set to 'force_reset' to forcefully return a RabbitMQ node to its virgin
 # state.
 rabbitmq_reset_option: reset
-
-# List of packages we register a restart.
-rabbitmq_restart_packages:
-  - upgrade: major
-    workround: "1:18.3.1-dfsg-1+hpelinux1"
-    package: erlang-base
-  - upgrade: "{%- if rabbitmq_config.hipe_compile -%}
-                major
-              {%- endif -%}"
-    workround: "1:18.3.1-dfsg-1+hpelinux1"
-    package: erlang-base-hipe
-  - upgrade: major
-    workround: "1:18.3.1-dfsg-1+hpelinux1"
-    package: erlang-nox
-  - upgrade: check
-    workround: 3.6.1
-    package: rabbitmq-server
 
 rabbitmq_service_name: rabbitmq-server
 

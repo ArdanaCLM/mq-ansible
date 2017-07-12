@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
 # (c) Copyright 2017 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -66,7 +66,7 @@
   logfile: testsuite-upgrade.log
   prefix: remove
   exec:
-    - copy.bash change-repo.yml repo=hos3.0_alpha-0
+    - copy.bash change-repo.yml repo=2015/hos3.0_alpha-0
 
 - name: test major upgrade limit 3.5.4
   logfile: testsuite-upgrade.log
@@ -110,7 +110,7 @@
   logfile: testsuite-upgrade.log
   prefix: remove
   exec:
-    - copy.bash change-repo.yml repo=hos2.0.2_ga-0
+    - copy.bash change-repo.yml repo=2016/hos2.0.2_ga-0
 
 - name: deploy rabbit 3.4.3
   logfile: testsuite-upgrade.log
@@ -128,7 +128,7 @@
   logfile: testsuite-upgrade.log
   prefix: remove
   exec:
-    - copy.bash change-repo.yml repo=hos3.0_alpha-0
+    - copy.bash change-repo.yml repo=2015/hos3.0_alpha-0
 #########
 - name: test major upgrade 3.5.4 no errlang change
   logfile: testsuite-upgrade.log
@@ -146,7 +146,7 @@
   logfile: testsuite-upgrade.log
   prefix: remove
   exec:
-    - copy.bash change-repo.yml repo=hos2.1.6_ga-0
+    - copy.bash change-repo.yml repo=2016/hos2.1.6_ga-0
 
 - name: test major upgrade 3.6.1 - errlang major
   logfile: testsuite-upgrade.log
@@ -189,7 +189,7 @@
   logfile: testsuite-upgrade.log
   prefix: remove
   exec:
-    - copy.bash change-repo.yml repo=hos3.0_alpha-0
+    - copy.bash change-repo.yml repo=2015/hos3.0_alpha-0
 
 - name: deploy rabbit 3.5.4
   logfile: testsuite-upgrade.log
@@ -207,7 +207,7 @@
   logfile: testsuite-upgrade.log
   prefix: remove
   exec:
-    - copy.bash change-repo.yml repo=hos2.1.6_ga-0
+    - copy.bash change-repo.yml repo=2016/hos2.1.6_ga-0
 ########
 - name: test major upgrade 3.6.1
   logfile: testsuite-upgrade.log
@@ -225,7 +225,7 @@
   logfile: testsuite-upgrade.log
   prefix: remove
   exec:
-    - copy.bash change-repo.yml repo=hos4.0_beta-3
+    - copy.bash change-repo.yml repo=2016/hos4.0_beta-3
 
 - name: test minor upgrade no erlang change
   logfile: testsuite-upgrade.log
@@ -267,7 +267,7 @@
   logfile: testsuite-upgrade.log
   prefix: remove
   exec:
-    - copy.bash change-repo.yml repo=hos2.1.6_ga-0
+    - copy.bash change-repo.yml repo=2016/hos2.1.6_ga-0
 
 - name: deploy rabbit 3.6.1
   logfile: testsuite-upgrade.log
@@ -285,7 +285,7 @@
   logfile: testsuite-upgrade.log
   prefix: remove
   exec:
-    - copy.bash change-repo.yml repo=hos4.0_beta-3
+    - copy.bash change-repo.yml repo=2016/hos4.0_beta-3
 
 - name: Update conf file change
   logfile: test6-update-conf-all.log
