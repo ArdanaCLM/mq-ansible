@@ -1,0 +1,728 @@
+#
+# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+- name: remove-rabbit
+  logfile: testsuite-remove.log
+  prefix: remove
+  exec:
+    - remove-rabbit.bash
+
+- name: Update conf file change
+  logfile: test6-update-conf-all.log
+  prefix: update-conf-all
+  exec:
+    - update-conf.bash '/rabbitmq_top/{s/^/#/}' ./rabbitmq/main.yml
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos2.0.2_ga-0
+
+### TODO: Although Ardana doesn't have mitaka release, we keep this section for
+### futher investigation in the future.
+# currently dont have a way to use old service defs
+# due to older changes not being compatible with multi-cp
+# in future comment this out and set mitaka release
+#- name: change service definitions
+#  logfile: testsuite-upgrade.log
+#  prefix: update-service-def
+#  exec:
+#    - change-input-model.bash kilo_release_branch
+
+- name: deploy rabbit 3.4.3
+  logfile: testsuite-upgrade.log
+  prefix: deploy-3.4
+  playbooks:
+    - rabbitmq-deploy.yml
+
+- name: create-user
+  logfile: testsuite-upgrade.log
+  prefix: create-user
+  exec:
+    - sudo rabbitmqctl add_user stack stack
+
+- name: Validate rabbit up
+  logfile: test1-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos3.0_alpha-0
+
+- name: test major upgrade limit 3.5.4
+  logfile: testsuite-upgrade.log
+  prefix: upgrade
+  playbooks:
+    - rabbitmq-upgrade.yml --limit *cp1*
+
+- name: Validate rabbit up
+  logfile: test1-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+- name: Validate cache is clear
+  logfile: testsuite-clear-cache
+  prefix: validate-cache
+  exec:
+    - copy.bash check-persistent-cache.yml
+
+- name: Validate db exists
+  logfile: testsuite-upgrade
+  prefix: validate-db
+  exec:
+    - check-user.bash
+
+# can only run bash scripts on one hosts current
+- name: test rabbitmq-server version
+  logfile: testsuite-upgrade.log
+  prefix: upgrade
+  exec:
+    - validate-upgrade.bash 3.5.4-3.1
+
+# workaround: can not run full upgrade after running with limit
+- name: remove-rabbit
+  logfile: testsuite-remove.log
+  prefix: remove
+  exec:
+    - remove-rabbit.bash
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos2.0.2_ga-0
+
+- name: deploy rabbit 3.4.3
+  logfile: testsuite-upgrade.log
+  prefix: deploy-3.4
+  playbooks:
+    - rabbitmq-deploy.yml
+
+- name: create-user
+  logfile: testsuite-upgrade.log
+  prefix: create-user
+  exec:
+    - sudo rabbitmqctl add_user stack stack
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos3.0_alpha-0
+#########
+- name: test major upgrade 3.5.4 no errlang change
+  logfile: testsuite-upgrade.log
+  prefix: upgrade
+  playbooks:
+    - rabbitmq-upgrade.yml
+
+- name: Validate rabbit up
+  logfile: test1-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos2.1.6_ga-0
+
+- name: test major upgrade 3.6.1 - errlang major
+  logfile: testsuite-upgrade.log
+  prefix: upgrade
+  playbooks:
+    - rabbitmq-upgrade.yml --limit *cp1*
+
+- name: Validate rabbit up
+  logfile: test1-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+- name: Validate cache is clear
+  logfile: testsuite-clear-cache
+  prefix: validate-cache
+  exec:
+    - copy.bash check-persistent-cache.yml
+
+- name: Validate db exists
+  logfile: testsuite-upgrade
+  prefix: validate-db
+  exec:
+    - check-user.bash
+
+- name: test rabbitmq-server version
+  logfile: testsuite-upgrade.log
+  prefix: upgrade
+  exec:
+    - validate-upgrade.bash 3.6.1-1+hlinux2
+
+# workaround: can not run full upgrade after running with limit
+- name: remove-rabbit
+  logfile: testsuite-remove.log
+  prefix: remove
+  exec:
+    - remove-rabbit.bash
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos3.0_alpha-0
+
+- name: deploy rabbit 3.5.4
+  logfile: testsuite-upgrade.log
+  prefix: deploy-3.5
+  playbooks:
+    - rabbitmq-deploy.yml
+
+- name: create-user
+  logfile: testsuite-upgrade.log
+  prefix: create-user
+  exec:
+    - sudo rabbitmqctl add_user stack stack
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos2.1.6_ga-0
+########
+- name: test major upgrade 3.6.1
+  logfile: testsuite-upgrade.log
+  prefix: upgrade
+  playbooks:
+    - rabbitmq-upgrade.yml
+
+- name: Validate rabbit up
+  logfile: test1-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos4.0_beta-3
+
+- name: test minor upgrade no erlang change
+  logfile: testsuite-upgrade.log
+  prefix: upgrade
+  playbooks:
+    - rabbitmq-upgrade.yml --limit *cp1*
+
+- name: Validate rabbit up
+  logfile: test1-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+- name: Validate cache is clear
+  logfile: testsuite-clear-cache
+  prefix: validate-cache
+  exec:
+    - copy.bash check-persistent-cache.yml
+
+- name: Validate db exists
+  logfile: testsuite-upgrade
+  prefix: validate-db
+  exec:
+    - check-user.bash
+
+- name: test rabbitmq-server version
+  logfile: testsuite-upgrade.log
+  prefix: upgrade
+  exec:
+    - validate-upgrade.bash 3.6.3-1+hpelinux1
+# workaround: can not run full upgrade after running with limit
+- name: remove-rabbit
+  logfile: testsuite-remove.log
+  prefix: remove
+  exec:
+    - remove-rabbit.bash
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos2.1.6_ga-0
+
+- name: deploy rabbit 3.6.1
+  logfile: testsuite-upgrade.log
+  prefix: deploy-3.6.1
+  playbooks:
+    - rabbitmq-deploy.yml
+
+- name: create-user
+  logfile: testsuite-upgrade.log
+  prefix: create-user
+  exec:
+    - sudo rabbitmqctl add_user stack stack
+
+- name: update apt repo
+  logfile: testsuite-upgrade.log
+  prefix: remove
+  exec:
+    - copy.bash change-repo.yml repo=hos4.0_beta-3
+
+- name: Update conf file change
+  logfile: test6-update-conf-all.log
+  prefix: update-conf-all
+  exec:
+    - update-conf.bash '/rabbitmq_top/{s/^#//}' ./rabbitmq/main.yml
+
+#########
+
+- name: test minor upgrade no erlang change
+  logfile: testsuite-upgrade.log
+  prefix: upgrade
+  playbooks:
+    - rabbitmq-upgrade.yml
+
+- name: Validate rabbit up
+  logfile: test1-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+# Singleton Tests
+
+# Test stop start/ one rabbit /singleton cluster
+- name: Test stop one rabbit on singleton Cluster
+  logfile: test1-stop.log
+  prefix: stop-rabbit-one-singleton
+  playbooks:
+    - rabbitmq-stop.yml --limit=project-cp1-c0-m1-mgmt
+
+- name: Validate rabbit Down
+  logfile: test1-validate-down.log
+  prefix: validate-rabbit-down
+  exec:
+    - validate-rabbit-down.bash
+
+- name: Test start one node
+  logfile: test1-start-one.log
+  prefix: start-rabbit-one-singleton
+  playbooks:
+    - rabbitmq-start.yml --limit=project-cp1-c0-m1-mgmt
+
+- name: Validate rabbit up
+  logfile: test1-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+
+# Test stop start/ one rabbit /Multi node cluster
+- name: Test stop one rabbit on Multi-Node Cluster
+  logfile: test2-stop-one-multi.log
+  prefix: stop-rabbit-one-multi
+  playbooks:
+    - rabbitmq-stop.yml --limit=project-cp2-c1-m1-mgmt
+
+- name: Test start one rabbit on Multi-Node Cluster
+  logfile: test2-start-one-multi.log
+  prefix: start-rabbit-one-multi
+  playbooks:
+    - rabbitmq-start.yml --limit=project-cp2-c1-m1-mgmt
+
+- name: Validate rabbit Up
+  logfile: test2-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+# Test stop start/ all rabbits in single cp /Multi node cluster
+# Must add flag as default case is stop on one host only
+# default stop will give "unsafe to stop on all hosts at once"
+- name: Test stop all rabbits on Multi-Node Cluster
+  logfile: test3-stop-all-multi.log
+  prefix: stop-rabbit-all-multi
+  playbooks:
+    - rabbitmq-stop.yml --limit=*cp2* -e "rabbitmq_do_not_reset_node=true"
+
+- name: Validate rabbit Down
+  logfile: test3-validate-down.log
+  prefix: validate-rabbit-down
+  exec:
+    - validate-rabbit-down.bash
+
+- name: Test start all rabbits on Multi-Node Cluster
+  logfile: test3-start-all-multi.log
+  prefix: start-rabbit-all-multi
+  playbooks:
+    - rabbitmq-start.yml --limit=*cp2*
+
+- name: Validate rabbit Up
+  logfile: test3-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+# Test stop start/ all rabbits in all control planes
+- name: Test stop all rabbits on all control planes
+  logfile: test4-stop-all-cps.log
+  prefix: stop-rabbit-all
+  playbooks:
+    - rabbitmq-stop.yml -e "rabbitmq_do_not_reset_node=true"
+
+- name: Validate rabbit Down
+  logfile: test4-validate-down.log
+  prefix: validate-rabbit-down
+  exec:
+    - validate-rabbit-down.bash
+
+- name: Test start all rabbits in all control planes
+  logfile: test4-start-all-cps.log
+  prefix: start-rabbit-all
+  playbooks:
+    - rabbitmq-start.yml
+
+- name: Validate rabbit Up
+  logfile: validate-rabbit-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+
+# Test Noop Reconfigure
+- name: Test Noop reconfigure
+  logfile: test5-reconfigure-noop.log
+  prefix: reconfigure-noop
+  playbooks:
+    - rabbitmq-reconfigure.yml
+
+- name: Validate cache is clear
+  logfile: testsuite-clear-cache
+  prefix: validate-cache
+  exec:
+    - copy.bash check-persistent-cache.yml
+
+- name: Validate db exists
+  logfile: testsuite-upgrade
+  prefix: validate-db
+  exec:
+    - check-user.bash
+
+# Test rabbit is up - This should test that rabbit has not restarted (TBD)
+- name: Validate rabbit
+  logfile: test5-validate-up
+  prefix: validate-rabbit
+  exec:
+    - validate-rabbit-up.bash
+
+- name: Update conf file change
+  logfile: test6-update-conf-all.log
+  prefix: update-conf-all
+  exec:
+    - update-conf.bash 's/{disk_free_limit, {{ rabbitmq_config.disk_free_limit }}}/{disk_free_limit, 500000000}/g' ./rabbitmq/rabbitmq.config.j2
+
+- name: Test reconfigure conf file change
+  logfile: test6-reconfigure-all.log
+  prefix: reconfigure-conf-all
+  playbooks:
+    - rabbitmq-reconfigure.yml
+
+- name: Validate cache is clear
+  logfile: testsuite-clear-cache
+  prefix: validate-cache
+  exec:
+    - copy.bash check-persistent-cache.yml
+
+- name: Validate db exists
+  logfile: testsuite-upgrade
+  prefix: validate-db
+  exec:
+    - check-user.bash
+
+- name: Test Conf File change
+  logfile: test7-test-conf.log
+  prefix: test-rabbit-conf
+  exec:
+    - test-rabbit-conf.bash cp1 disk_free_limit 500000000
+
+- name: Update conf file change for limit test
+  logfile: test8-update-conf-limit.log
+  prefix: update-conf-limited
+  exec:
+    - update-conf.bash 's/{disk_free_limit, 500000000}/{disk_free_limit, {{ rabbitmq_config.disk_free_limit }}}/g' ./rabbitmq/rabbitmq.config.j2
+
+- name: Test reconfigure conf Limit to Single Control Plane
+  logfile: test8-reconfigure-limit.log
+  prefix: reconfigure-conf-limited
+  playbooks:
+    - rabbitmq-reconfigure.yml  --limit=*cp1*
+
+- name: Validate cache is clear
+  logfile: testsuite-clear-cache
+  prefix: validate-cache
+  exec:
+    - copy.bash check-persistent-cache.yml
+
+- name: Validate db exists
+  logfile: testsuite-upgrade
+  prefix: validate-db
+  exec:
+    - check-user.bash
+
+# Currently exec only runs on the deployer so the second exec cannot
+# actually check the state of cp2 here . TBD we need a way to
+# run command on multiple hosts in the cluster not just on deployer
+# ideally this should be part of the test harness
+- name: Test Conf File change
+  logfile: test8-test-conf-limited.log
+  prefix: test-conf-limited
+  exec:
+    -  test-rabbit-conf.bash cp1 disk_free_limit 1000000000
+    -  test-rabbit-conf.bash cp2 disk_free_limit 500000000
+
+- name: Test - Reset to original disk_free_limit on all cps
+  logfile: test8-reconfigure-all.log
+  prefix: reconfigure-conf-limited
+  playbooks:
+    - rabbitmq-reconfigure.yml
+
+- name: Update password  for single control plane
+  logfile: test9-update-pwd-change.log
+  prefix: update-pwd
+  exec:
+    - update-pwd.bash ~/ardana-ci-tests/pwd_change_cp1.yml
+
+# Confirm with Nick what the difference is with
+# configure users
+- name: Test reconfigure password change
+  logfile: test9-reconfigure-pwd-change.log
+  prefix: reconfigure-password-change
+  playbooks:
+    - rabbitmq-reconfigure-credentials.yml
+
+- name: Test Password Change Result - Validate Rabbit up
+  logfile: test9-validate-rabbit-up.log
+  prefix: test-conf-limited
+  exec:
+    - validate-rabbit-up.bash
+
+- name: Test Pasword change Result - Validate access to keystone
+  logfile: test9-test-rmq-access.log
+  prefix: test-conf-limited
+  exec:
+    -  test-rmq-access.bash cp1 rmq_keystone_user mynewpassword
+
+# TBD - We need to configure another service on the second
+# control plane to do this testing
+#
+# Currently only have user on one control plane because
+# only have a rabbit service ( ie keystone ) on one control plane
+#
+# - name: Update password  for all control planes
+#  logfile: testsuite-reconfigure-pwd-change.log
+#  prefix: update-pwd
+#  exec:
+#    - update-pwd.bash ~/ardana-ci-tests/pwd_change_cp1.yml
+#    - update-pwd.bash ~/ardana-ci-tests/pwd_change_cp2.yml
+
+#- name: Test reconfigure password change
+#  logfile: testsuite-reconfigure-pwd-change.log
+#  prefix: reconfigure-password-change-all
+#  playbooks:
+#    - rabbitmq-reconfigure-credentials.yml --limit=*cp2*
+
+#- name: Test Password change Result - Access to keystone
+#  logfile: testsuite-reconfigure-pwd-change.log
+#  prefix: test-conf-limited
+#  exec:
+#    - validate-rabbit-up.bash
+
+# Currently exec only runs this on the deplouyer so this does not really
+# check cp2
+#- name: Test Password change Result - Password on control planes
+#  logfile: testsuite-reconfigure-conf-change.log
+#  prefix: test-conf-limited
+#  exec:
+#    - test-rmq-access.bash cp2 rmq_keystone_user mynewpassword
+
+# Reboot Tests - Single Host reboots  TBD check if test harness has
+# long enough sleep as next test failing occassionally without sleep
+- name: Test reboot server2
+  logfile: test10-reboot.log
+  prefix: reboot-server2
+  vms:
+    - reboot: server2
+
+- name: Test reboot server2
+  logfile: test10-sleep.log
+  prefix: sleep-for-1
+  exec:
+    - sleep 60
+
+# Note here rabbit does not start on reboot so you have to explictly
+# start it
+- name: Test we are down
+  logfile: test10-validate-down.log
+  prefix: validate-rabbit-down
+  exec:
+    - validate-rabbit-down.bash
+
+- name: Start rabbit on server2
+  logfile: test10-start-rabbit-limit.log
+  prefix: start-on-server2
+  playbooks:
+    - rabbitmq-start.yml --limit=project-cp2-c1-m1-mgmt
+
+# This is the same as the previous test just
+# is testing a 2nd server reboot in sequence
+# with the first one which can sometimes be a useful test
+- name: Test reboot server3
+  logfile: test11-reboot.log
+  prefix: reboot-server3
+  vms:
+    - reboot: server3
+
+- name: Test reboot server3
+  logfile: test11-sleep.log
+  prefix: sleep-for-1
+  exec:
+    - sleep 60
+
+# Note here rabbit does not start on reboot so you have to explictly
+# start it
+- name: Test we are down
+  logfile: test11-validate-down.log
+  prefix: validate-rabbit-down
+  exec:
+    - validate-rabbit-down.bash
+
+- name: Start rabbit on server3
+  logfile: test11-start-rabbit.log
+  prefix: start-on-server3
+  playbooks:
+    - rabbitmq-start.yml --limit=project-cp2-c1-m2-mgmt
+
+- name: Test we are up
+  logfile: test11-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+- name: Test reboot  - Singleton rabbit cluster reboot server here
+  logfile: test12-reboot-singleton.log
+  prefix: reboot-singleton
+  vms:
+    - reboot: server1
+
+- name: Test reboot server1
+  logfile: test12-sleep.log
+  prefix: sleep-for-1
+  exec:
+    - sleep 60
+
+# Note here rabbit does not start on reboot so you have to explictly
+# start it
+- name: Test we are down
+  logfile: test12-validate-down.log
+  prefix: validate-rabbit-down
+  exec:
+    - validate-rabbit-down.bash
+
+- name: Start rabbit on server1
+  logfile: test12-start-limited.log
+  prefix: start-on-server1
+  playbooks:
+    - rabbitmq-start.yml --limit=project-cp1-c0-m1-mgmt
+
+- name: Test we are up
+  logfile: test12-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+# Test remove node
+
+- name: Test remove rabbit on server2
+  logfile: test13-remove.log
+  prefix: remove-rabbit-one
+  playbooks:
+    - rabbitmq-remove.yml --limit=project-cp2-c1-m1-mgmt
+
+# TBD this needs to test rabbit ok on other 2 hosts
+- name: Test we are down on that host
+  logfile: test13-validate-down.log
+  prefix: validate-rabbit-down
+  exec:
+    - validate-rabbit-down.bash
+
+- name: Test depooy rabbit on server2
+  logfile: test13-deploy-one-limit.log
+  prefix: deploy-rabbit-one
+  playbooks:
+    - rabbitmq-deploy.yml --limit=project-cp2-c1-m1-mgmt
+
+- name: Test we are up on that host
+  logfile: test13-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+# Test Blow away/disaster recovery
+- name: Test stop all rabbits on all control planes
+  logfile: test13-stop-permit-multi.log
+  prefix: stop-rabbit-all
+  playbooks:
+    - rabbitmq-stop.yml --limit=*cp2* -e "rabbitmq_permit_multi_stop=true"
+
+- name: Validate rabbit Down
+  logfile: test13-validate-rabbit-down.log
+  prefix: validate-rabbit-down
+  exec:
+    - validate-rabbit-down.bash
+
+- name: Validate rabbit Up on cp1
+  logfile: test13-validate-rabbit-up.log
+  prefix: validate-rabbit-up
+  playbooks:
+    - rabbitmq-status.yml --limit=*cp1*
+
+- name: Test disaster recovery in one control planes
+  logfile: test13-disaster-recovery.log
+  prefix: start-rabbit-all
+  playbooks:
+    - rabbitmq-disaster-recovery.yml --limit=*cp2*
+
+- name: Validate rabbit Up
+  logfile: test13-validate-up.log
+  prefix: validate-rabbit-up
+  exec:
+    - validate-rabbit-up.bash
+
+
+# TBD - lots more tests to be done, would be useful
+# to be able to add upgrade in here e.g.
+# Test more rabbit operations
+# Test no op upgrade
+# Test upgrade
+# Test configure Monasca
+# Also we need to be able to add a pattern for checking
+# all hosts not just the deployer host in tests...need a mechanism
+# for this in the test harness
