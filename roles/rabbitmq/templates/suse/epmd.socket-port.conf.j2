@@ -1,7 +1,6 @@
 {#
 #
-# (c) Copyright 2015-2017 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,19 +15,6 @@
 # under the License.
 #
 #}
-[Unit]
-Description=RabbitMQ broker
-After=syslog.target network.target
-
-[Service]
-Type=notify
-User=rabbitmq
-Group=rabbitmq
-LimitNOFILE=65535
-NotifyAccess=all
-WorkingDirectory=/var/lib/rabbitmq
-ExecStart=/usr/sbin/rabbitmq-server
-ExecStop=/usr/sbin/rabbitmqctl stop
-
-[Install]
-WantedBy=multi-user.target
+[Socket]
+ListenStream={{ rabbitmq_cp.management_address.ip }}:4369
+FreeBind=true

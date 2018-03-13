@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2015-2017 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -83,14 +83,32 @@
     item.upgrade != "" and
     ansible_os_family == 'Suse'
 
-- name: rabbitmq | install | SUSE - Create rabbitmq-server.service
+# The epmd.socket unit is enabled by default but only listens on 127.0.0.1,
+# while we need it to listen on the management network too.
+- name: rabbitmq | install | Create epmd.socket.d directory
+  become: yes
+  file:
+    path: /etc/systemd/system/epmd.socket.d
+    state: directory
+    mode: 0755
+  when:
+    ansible_os_family == 'Suse'
+
+- name: rabbitmq | install | SUSE - Create epmd.socket.d/port.conf
   become: yes
   template:
-    src: suse/rabbitmq-server.service.j2
-    dest: /usr/lib/systemd/system/rabbitmq-server.service
+    src: suse/epmd.socket-port.conf.j2
+    dest: /etc/systemd/system/epmd.socket.d/port.conf
     mode: 0644
+  register: _epmd_socket_conf_result
   when:
-    _rabbitmq_install_zypper_result.changed and
+    ansible_os_family == 'Suse'
+
+- name: rabbitmq | install | SUSE - Reload systemd for epmd.socket extension
+  become: yes
+  command: systemctl daemon-reload
+  when:
+    _epmd_socket_conf_result.changed and
     ansible_os_family == 'Suse'
 
 - name: rabbitmq | install | SUSE - Remove Erlang sd_notify lib
