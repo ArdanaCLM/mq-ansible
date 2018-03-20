@@ -32,46 +32,6 @@
   with_items: procps
   when: ansible_os_family == 'Suse'
 
-- name: rabbitmq | install | Check for Erlang sd_notify lib
-  stat:
-    path: /usr/lib/erlang/lib/sd_notify-0.9
-  register: _rabbitmq_install_sd_notify_stat_result
-
-- name: rabbitmq | install | Disable Erlang sd_notify lib
-  become: yes
-  file:
-    path: /usr/lib/erlang/lib/sd_notify-0.9
-    state: absent
-  when: _rabbitmq_install_sd_notify_stat_result.stat.exists
-
-- name: rabbitmq | install | Debian - Install RabbitMQ application
-  become: yes
-  apt:
-    name: "{{ item.package }}"
-    force: yes
-    state: latest
-  register: _rabbitmq_install_apt_result
-  with_items: rabbitmq_restart_packages
-  when:
-    item.upgrade != "" and
-    ansible_os_family == 'Debian'
-
-- name: rabbitmq | install | Debian - Remove Erlang sd_notify lib
-  become: yes
-  apt:
-    name: erlang-sd-notify
-    force: yes
-    state: absent
-    purge: yes
-  when:
-    _rabbitmq_install_sd_notify_stat_result.stat.exists and
-    ansible_os_family == 'Debian'
-
-- name: rabbitmq | install | Debian - Store registered facts
-  set_fact:
-    _rabbitmq_install_pkg_result: "{{ _rabbitmq_install_apt_result }}"
-  when: ansible_os_family == 'Debian'
-
 - name: rabbitmq | install | SUSE - Install RabbitMQ application
   become: yes
   zypper:
@@ -109,15 +69,6 @@
   command: systemctl daemon-reload
   when:
     _epmd_socket_conf_result.changed and
-    ansible_os_family == 'Suse'
-
-- name: rabbitmq | install | SUSE - Remove Erlang sd_notify lib
-  become: yes
-  zypper:
-    name: erlang-sd-notify
-    state: absent
-  when:
-    _rabbitmq_install_sd_notify_stat_result.stat.exists and
     ansible_os_family == 'Suse'
 
 - name: rabbitmq | install | SUSE - Store registered facts
