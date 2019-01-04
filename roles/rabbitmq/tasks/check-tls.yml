@@ -26,3 +26,13 @@
     ((rabbitmq_tls_enabled | bool) and
       (not (ardana_notify_rabbitmq_reset_required.stdout |
             search("'amqp/ssl'"))))
+
+- name: rabbitmq | check-tls | Check RabbitMQ inter-node TLS state
+  become: yes
+  shell: >
+    grep 'proto_dist inet_tls' "{{ rabbitmq_etc_dir }}/rabbitmq-env.conf" ||
+    true
+  register: ardana_notify_rabbitmq_major_change
+  changed_when: >
+    rabbitmq_tls_replication | bool and
+    ardana_notify_rabbitmq_major_change.stdout == ""
