@@ -190,6 +190,10 @@ rabbitmq_env:
   # See: https://www.rabbitmq.com/networking.html
   #   Increase the Erlang Thread Pool to 128 (default 64).
   rabbitmq_io_thread_pool_size: 128
+  # See 'rabbitmq_tls_erl_args' for configuration details.
+  erl_ssl_path: "{{ erl_ssl_path }}"
+  server_additional_erl_args: "{{ rabbitmq_tls_erl_args | quote }}"
+  ctl_erl_args: "{{ rabbitmq_tls_erl_args | quote }}"
 
 # RabbitMQ config.
 rabbitmq_config:
@@ -215,7 +219,7 @@ rabbitmq_tls:
 rabbitmq_tls_erl_args: >-
   {%- if (rabbitmq_tls_enabled | bool) and
          (rabbitmq_tls_replication | bool) -%}
-    -pa {{ rabbitmq_tls.erlang_ssl_symlink }}
+    -pa $ERL_SSL_PATH
     -proto_dist inet_tls
     -ssl_dist_opt server_certfile {{ rabbitmq_tls.pem_file }}
     -ssl_dist_opt server_keyfile {{ rabbitmq_tls.pem_file }}

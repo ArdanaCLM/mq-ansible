@@ -116,6 +116,7 @@
     - rabbitmq
   tasks:
     - include: roles/rabbitmq/tasks/write-configuration.yml
+    - include: roles/rabbitmq/tasks/_write-rabbitmq-env-config.yml
       when: (_rabbitmq_major_change | bool)
 
     - include: roles/rabbitmq/tasks/install.yml
