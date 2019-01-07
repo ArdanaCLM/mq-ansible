@@ -18,9 +18,10 @@
 - name: rabbitmq | start | Ensure that RabbitMQ service is started
   become: yes
   service:
-    name: rabbitmq-server
+    name: "{{ item }}"
     enabled: no
     state: started
+  with_items: rabbitmq_server_services
   register: _rabbitmq_start_result
 
 # It is possible that RabbitMQ service was started but we are at stop_app
