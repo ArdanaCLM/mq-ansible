@@ -26,16 +26,6 @@
     mode: 0644
   register: ardana_notify_rabbitmq_reset_required
 
-- name: rabbitmq | write-configuration | Create rabbitmq-env.conf
-  become: yes
-  template:
-    src: rabbitmq-env.conf.j2
-    dest: "{{ rabbitmq_etc_dir }}/rabbitmq-env.conf"
-    owner: root
-    group: root
-    mode: 0644
-  register: ardana_notify_rabbitmq_reset_required
-
 - name: rabbitmq | write-configuration | Create rabbitmq.config
   become: yes
   template:
