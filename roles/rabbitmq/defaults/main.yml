@@ -221,9 +221,3 @@ rabbitmq_tls_erl_args: >-
     -ssl_dist_opt server_keyfile {{ rabbitmq_tls.pem_file }}
     -ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true
   {%- endif -%}
-
-# Services which comprised RabbitMQ Server. We need to treat them as a
-# whole when starting and stopping rabbitmq-server.
-rabbitmq_server_services:
-  - epmd.socket
-  - rabbitmq-server

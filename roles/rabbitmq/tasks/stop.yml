@@ -51,18 +51,16 @@
 - name: rabbitmq | stop | Ensure that RabbitMQ service is stopped
   become: yes
   service:
-    name: "{{ item }}"
+    name: rabbitmq-server
     enabled: no
     state: stopped
-  with_items: rabbitmq_server_services
   when: inventory_hostname != rabbitmq_primary_hostname
 
 # Stop the RabbitMQ application including Erlang.
 - name: rabbitmq | stop | Ensure that RabbitMQ service is stopped
   become: yes
   service:
-    name: "{{ item }}"
+    name: rabbitmq-server
     enabled: no
     state: stopped
-  with_items: rabbitmq_server_services
   when: inventory_hostname == rabbitmq_primary_hostname
