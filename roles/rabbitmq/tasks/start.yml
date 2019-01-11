@@ -15,20 +15,6 @@
 # under the License.
 #
 ---
-- name: rabbitmq | start | Get the process ID for epmd
-  shell: >
-    pgrep epmd
-  register: grep_epmd_pid_result
-  ignore_errors: yes
-
-- name: rabbitmq | start | Ensure that epmd.socket service is started
-  become: yes
-  service:
-    name: epmd.socket
-    enabled: no
-    state: started
-  when: grep_epmd_pid_result.stdout != ""
-
 - name: rabbitmq | start | Ensure that RabbitMQ service is started
   become: yes
   service:
