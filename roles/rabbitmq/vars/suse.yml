@@ -15,6 +15,10 @@
 # under the License.
 #
 
+# Placeholder for Erlang SSL module path. Expect to be overwritten
+# by the tasks when setting up SSL for distribution.
+erl_ssl_path:
+
 # List of packages we register a restart.
 rabbitmq_restart_packages:
   - upgrade: check

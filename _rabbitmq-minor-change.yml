@@ -31,6 +31,11 @@
               ((ardana_notify_rabbitmq_major_change | default(false)) and
               ardana_notify_rabbitmq_major_change.changed))
 
+    - include: roles/rabbitmq/tasks/_write-rabbitmq-env-config.yml
+      when: (not
+              ((ardana_notify_rabbitmq_major_change | default(false)) and
+              ardana_notify_rabbitmq_major_change.changed))
+
     - name: rabbitmq | _rabbitmq-minor-change | Set fact rabbitmq_minor_change
       set_fact:
         _rabbitmq_minor_change: "{{

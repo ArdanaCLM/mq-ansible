@@ -66,6 +66,11 @@
     _rabbitmq_install_pkg_result: "{{ _rabbitmq_install_zypper_result }}"
   when: ansible_os_family == 'Suse'
 
+# We need to create rabbitmq-env.config after the Erlang package is
+# available because we need to use /usr/bin/erl command to determine the
+# Erlang SSL module path.
+- include: _write-rabbitmq-env-config.yml
+
 - name: rabbitmq | install | Restart RabbitMQ application
   become: yes
   service:
