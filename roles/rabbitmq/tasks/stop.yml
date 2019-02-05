@@ -54,13 +54,6 @@
     name: rabbitmq-server
     enabled: no
     state: stopped
-  when: inventory_hostname != rabbitmq_primary_hostname
 
-# Stop the RabbitMQ application including Erlang.
-- name: rabbitmq | stop | Ensure that RabbitMQ service is stopped
-  become: yes
-  service:
-    name: rabbitmq-server
-    enabled: no
-    state: stopped
-  when: inventory_hostname == rabbitmq_primary_hostname
+- include: _stop_epmd.yml
+

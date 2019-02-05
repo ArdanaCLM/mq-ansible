@@ -30,6 +30,8 @@
     enabled: no
     state: stopped
 
+- include: _stop_epmd.yml
+
 - name: rabbitmq | remove | Forcfully clear down all mnesia
   become: yes
   file:
