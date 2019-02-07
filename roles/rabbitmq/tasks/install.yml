@@ -70,6 +70,7 @@
 # available because we need to use /usr/bin/erl command to determine the
 # Erlang SSL module path.
 - include: _write-rabbitmq-env-config.yml
+  when: _rabbitmq_install_pkg_result.changed
 
 - name: rabbitmq | install | Restart RabbitMQ application
   become: yes
