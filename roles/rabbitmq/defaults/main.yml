@@ -222,6 +222,5 @@ rabbitmq_tls_erl_args: >-
     -pa $ERL_SSL_PATH
     -proto_dist inet_tls
     -ssl_dist_opt server_certfile {{ rabbitmq_tls.pem_file }}
-    -ssl_dist_opt server_keyfile {{ rabbitmq_tls.pem_file }}
     -ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true
   {%- endif -%}
