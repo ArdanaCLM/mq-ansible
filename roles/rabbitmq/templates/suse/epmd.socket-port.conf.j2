@@ -16,5 +16,13 @@
 #
 #}
 [Socket]
-ListenStream={{ rabbitmq_cp.management_address.ip }}:4369
+# The following line clears any other setup from /usr/lib/systemd/system/epmd.socket
+ListenStream=
+# Rabbit mq requires binding to localhost
+ListenStream=127.0.0.1:4369
+ListenStream=[::1]:4369
+
+#Bind to management ip address
+ListenStream={{ rabbitmq_cp.management_address.ip | ipwrap }}:4369
 FreeBind=true
+
