@@ -192,8 +192,8 @@ rabbitmq_env:
   rabbitmq_io_thread_pool_size: 128
   # See 'rabbitmq_tls_erl_args' for configuration details.
   erl_ssl_path: "{{ erl_ssl_path }}"
-  server_additional_erl_args: "{{ rabbitmq_tls_erl_args | quote }}"
-  ctl_erl_args: "{{ rabbitmq_tls_erl_args | quote }}"
+  server_additional_erl_args: "{{ server_erl_args | quote }}"
+  ctl_erl_args: "{{ ctl_erl_args | quote }}"
 
 # RabbitMQ config.
 rabbitmq_config:
@@ -214,13 +214,49 @@ rabbitmq_tls:
   pem_file: >
     {{ rabbitmq_cert_dir }}/{{ rabbitmq_cp.control_plane }}-rabbitmq.pem
 
-# RabbitMQ cluster TLS additional aguments as per:
-#   https://www.rabbitmq.com/clustering-ssl.html
-rabbitmq_tls_erl_args: >-
-  {%- if (rabbitmq_tls_enabled | bool) and
-         (rabbitmq_tls_replication | bool) -%}
-    -pa $ERL_SSL_PATH
+# RabbitMQ cluster additional aguments as per:
+# https://www.rabbitmq.com/clustering-ssl.html
+#three possible values for -proto_dist:
+#ipv6 with tls (inet6_tls),
+#ipv4 with tls (inet_tls)
+#ipv6 no tls (inet6_tcp)
+# **ipv4 no tls is the default, so we don't have to set -proto_dist.
+erl_proto_dist: >-
+ {%- if (rabbitmq_tls_enabled | bool) and
+         (rabbitmq_tls_replication | bool) and
+         (host.bind.FND_RMQ.rabbitmq_epmd.ip_address | ipv6) -%}
+    -proto_dist inet6_tls
+ {%- elif (rabbitmq_tls_enabled | bool) and
+           (rabbitmq_tls_replication | bool) -%}
     -proto_dist inet_tls
+ {%- elif (host.bind.FND_RMQ.rabbitmq_epmd.ip_address | ipv6) -%}
+    -proto_dist inet6_tcp
+ {%- endif -%}
+
+# If using ipv6 we need extra settings in the server arguments
+server_erl_args: >-
+ {%- if (rabbitmq_tls_enabled | bool) and
+         (rabbitmq_tls_replication | bool) -%}
+ {%   if (host.bind.FND_RMQ.rabbitmq_epmd.ip_address | ipv6) %}
+    -kernel inetrc "/etc/rabbitmq/erl_inetrc"
+ {%   endif %}
+    {{ erl_proto_dist }}
+    -pa $ERL_SSL_PATH
     -ssl_dist_opt server_certfile {{ rabbitmq_tls.pem_file }}
     -ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true
-  {%- endif -%}
+ {%- elif (host.bind.FND_RMQ.rabbitmq_epmd.ip_address | ipv6) %}
+     -kernel inetrc "/etc/rabbitmq/erl_inetrc"
+    {{ erl_proto_dist }}
+ {%- endif -%}
+
+# For IPv6 ctl only needs the correct -prot_dist to be used.
+ctl_erl_args: >-
+ {%- if (rabbitmq_tls_enabled | bool) and
+       (rabbitmq_tls_replication | bool) -%}
+    {{ erl_proto_dist }}
+    -pa $ERL_SSL_PATH
+    -ssl_dist_opt server_certfile {{ rabbitmq_tls.pem_file }}
+    -ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true
+ {%- elif (host.bind.FND_RMQ.rabbitmq_epmd.ip_address | ipv6) %}
+    {{ erl_proto_dist }}
+ {%- endif -%}

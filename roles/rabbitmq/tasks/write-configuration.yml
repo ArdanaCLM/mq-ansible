@@ -36,6 +36,16 @@
     mode: 0644
   register: ardana_notify_rabbitmq_reset_required
 
+- name: rabbitmq | write-configuration | kernel ipv6 option
+  become: yes
+  template:
+    src: rabbitmq_erl_inetrc.j2
+    dest: "{{ rabbitmq_etc_dir }}/erl_inetrc"
+    owner: root
+    group: root
+    mode: 0644
+  register: ardana_notify_rabbitmq_reset_required
+
 - name: rabbitmq | write-configuration | Check logrotate rabbitmq-server file
   stat:
     path: /etc/logrotate.d/rabbitmq-server
