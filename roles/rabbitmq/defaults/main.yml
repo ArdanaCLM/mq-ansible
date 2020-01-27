@@ -260,3 +260,15 @@ ctl_erl_args: >-
  {%- elif (host.bind.FND_RMQ.rabbitmq_epmd.ip_address | ipv6) %}
     {{ erl_proto_dist }}
  {%- endif -%}
+
+# NOTE(gyee) num_queues is the ceiling of number of nodes divided by 2. Per
+# https://bugs.launchpad.net/tripleo/+bug/1628998
+# However it is recommended that we don't neccessary need more than 3
+# copies, regardless of number of nodes.
+num_queues: "{{ (rabbitmq_cluster_size|int / 2) | round(0, 'ceil') | int }}"
+max_num_queues: >
+  {%- if num_queues|int > 3 -%}
+    3
+  {%- else -%}
+    {{ num_queues }}
+  {%- endif -%}
