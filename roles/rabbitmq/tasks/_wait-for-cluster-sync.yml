@@ -98,3 +98,27 @@
           _rabbitmq_sync_cluster_result.stderr == ""
   retries: "{{ rabbitmq_sync_retries }}"
   delay: "{{ rabbitmq_sync_delay }}"
+
+# SOC-11083: Seeing that sometimes the retry until loop can exceed retries
+# without failing, so fail here if that is the case, after printing results
+- name: rabbitmq | _wait-for-cluster-sync | Print settings if failed
+  debug:
+    var: _rabbitmq_sync_cluster_result
+  when:
+    - not (_rabbitmq_sync_cluster_result | skipped)
+    - ((_rabbitmq_sync_cluster_result | failed) or
+       (_rabbitmq_sync_cluster_result.stdout != "") or
+       (_rabbitmq_sync_cluster_result.stderr != ""))
+
+- name: rabbitmq | _wait-for-cluster-sync | Ensure we fail if retries exceeded
+  debug:
+    msg: >-
+      rabbitmq HA queue sync failed to complete after
+      {{ (rabbitmq_sync_retries | int) * (rabbitmq_sync_delay | int) }}
+      ({{ rabbitmq_sync_retries }} * {{ rabbitmq_sync_delay }}) seconds.
+  when:
+    - not (_rabbitmq_sync_cluster_result | skipped)
+    - ((_rabbitmq_sync_cluster_result | failed) or
+       (_rabbitmq_sync_cluster_result.stdout != "") or
+       (_rabbitmq_sync_cluster_result.stderr != ""))
+
