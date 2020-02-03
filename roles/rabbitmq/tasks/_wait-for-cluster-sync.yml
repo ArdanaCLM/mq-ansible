@@ -28,6 +28,16 @@
   failed_when: false
   changed_when: false
 
+- name: rabbitmq | _wait-for-cluster-sync | Check if RabbitMQ is in a mirror
+  become: yes
+  delegate_to: "{{ rabbitmq_remote_host }}"
+  shell: >
+    rabbitmqctl list_queues -q policy state synchronised_slave_pids 2>/dev/null |
+    grep '^{{ rabbitmq_ha_policy_name }}\s*running\s'
+  register: _rabbitmq_in_mirror_result
+  failed_when: false
+  changed_when: false
+
 - name: rabbitmq | _wait-for-cluster-sync | Wait for HA queue sync to complete
   become: yes
   delegate_to: "{{ rabbitmq_remote_host }}"
@@ -75,12 +85,14 @@
     awk -F"<{{ rabbitmq_node }}@" \
         '/^{{ rabbitmq_ha_policy_name }}\t/ && \
           (!/\trunning\t/ || \
-            NF < {{ _rabbitmq_in_cluster_result.stdout_lines | length }}) \
+            NF < {{ max_num_queues }}) \
         {print}'
   changed_when: false
   register: _rabbitmq_sync_cluster_result
   when: (_rabbitmq_in_cluster_result | success) and
-        (_rabbitmq_in_cluster_result.stdout | search(rabbitmq_nodename))
+        (_rabbitmq_in_mirror_result | success) and
+        (_rabbitmq_in_cluster_result.stdout | search(rabbitmq_nodename)) and
+        (_rabbitmq_in_mirror_result.stdout | search(rabbitmq_nodename))
   until: (_rabbitmq_sync_cluster_result | success) and
           _rabbitmq_sync_cluster_result.stdout == "" and
           _rabbitmq_sync_cluster_result.stderr == ""
