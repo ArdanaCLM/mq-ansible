@@ -17,8 +17,8 @@
 ---
 
 #
-# Make sure that all queues (except those with auto-generated names,
-# '*_fanout_*' or `reply_*`) are mirrored across all nodes in the cluster.
+# Make sure that all queues (except those with auto-generated names or
+# '*_fanout_*') are mirrored across all nodes in the cluster.
 #
 
 # NOTE(gyee): to minimize disruption, we only need to reset the HA policy
