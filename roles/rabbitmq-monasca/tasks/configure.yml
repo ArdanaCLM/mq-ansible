@@ -36,3 +36,7 @@
       watch_api: False
   when: ("rabbitmq_management" not in (rabbitmq_plugins | default([], true))) or
         (not (rabbitmq_monasca_full_monitoring | bool))
+
+- name: rabbitmq-monasca | configure | Configure TLS certificate monitoring
+  include: configure_tls.yml
+  when: rabbitmq_tls_enabled | bool

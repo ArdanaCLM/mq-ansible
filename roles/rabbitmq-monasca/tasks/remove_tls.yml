@@ -1,6 +1,5 @@
 #
-# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2020 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,13 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
----
-- name: rabbitmq-monasca | remove | Remove Monasca RabbitMQ config
-  become: yes
-  file:
-    path: /etc/monasca/agent/conf.d/rabbitmq.yaml
-    state: absent
+# Start mysql on these nodes. Note if the whole cluster is down
+# this will not start as a boostrap will need to run on one node
 
-- name: rabbitmq-monasca | remove | Remove TLS certificate monitoring
-  include: remove_tls.yml
-  when: rabbitmq_tls_enabled | bool
+---
+- name: rabbitmq-monasca | remove_tls |
+        Remove Monasca detection plugin for rabbitmq TLS certs
+  become: yes
+  monasca_agent_plugin:
+    name: CertificateFileCheck
+    args:
+      cert_files: "{{ rabbitmq_tls.monitoring_pem_file }}"
+      dimensions: "service:rabbitmq"
+    state: absent

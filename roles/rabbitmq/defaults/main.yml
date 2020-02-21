@@ -213,6 +213,8 @@ rabbitmq_tls:
     {{ rabbitmq_cert_dir }}/{{ rabbitmq_cp.control_plane }}-rabbitmq.req
   pem_file: >
     {{ rabbitmq_cert_dir }}/{{ rabbitmq_cp.control_plane }}-rabbitmq.pem
+  monitoring_pem_file: >
+    {{ rabbitmq_cert_dir }}/{{ rabbitmq_cp.control_plane }}-rabbitmq-monitoring.pem
 
 # RabbitMQ cluster TLS additional aguments as per:
 #   https://www.rabbitmq.com/clustering-ssl.html
