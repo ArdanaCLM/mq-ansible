@@ -111,7 +111,7 @@
        (_rabbitmq_sync_cluster_result.stderr != ""))
 
 - name: rabbitmq | _wait-for-cluster-sync | Ensure we fail if retries exceeded
-  debug:
+  fail:
     msg: >-
       rabbitmq HA queue sync failed to complete after
       {{ (rabbitmq_sync_retries | int) * (rabbitmq_sync_delay | int) }}
