@@ -55,5 +55,12 @@
     enabled: no
     state: stopped
 
+- name: rabbitmq | stop | Ensure that epmd service is stopped
+  become: yes
+  service:
+    name: epmd.service
+    enabled: no
+    state: stopped
+
 - include: _stop_epmd.yml
 

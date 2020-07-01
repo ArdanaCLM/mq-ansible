@@ -15,6 +15,13 @@
 # under the License.
 #
 ---
+- name: rabbitmq | start | Ensure that epmd service is started
+  become: yes
+  service:
+    name: epmd.service
+    enabled: no
+    state: started
+
 - name: rabbitmq | start | Ensure that RabbitMQ service is started
   become: yes
   service:
