@@ -17,9 +17,9 @@
 ---
 
 #
-# Make sure that all queues (except those with auto-generated names or
-# '*_fanout_*' and 'reply_*') are mirrored across enough nodes in the
-# cluster to achieve quorum (but not more than 3).
+# Make sure that all queues (except those with auto-generated names)
+# are mirrored across enough nodes in the cluster to achieve quorum
+# (but not more than 3).
 #
 
 # NOTE(gyee): to minimize disruption, we only need to reset the HA policy
@@ -35,8 +35,8 @@
   become: yes
   shell: >
     rabbitmqctl set_policy {{ rabbitmq_ha_policy_name }}
-    '^(?!(amq\.)|(.*_fanout_)|(reply_)).*' '{"ha-mode":"exactly","ha-params":{{ max_num_queues }},"ha-sync-mode":"automatic"}'
-  when: not rabbitmq_list_ha_policy_result.stdout | search('\^\(\?\!\(amq\\\\\\\.\)\|\(\.\*_fanout_\)\|\(reply_\)\)\.\*\s*{"ha-mode":"exactly","ha-params":{{ max_num_queues }},"ha-sync-mode":"automatic"}')
+    '^(?!amq\.).*' '{"ha-mode":"exactly","ha-params":{{ max_num_queues }},"ha-sync-mode":"automatic"}'
+  when: not rabbitmq_list_ha_policy_result.stdout | search('\^\(\?\!amq\\\\\\\.\)\.\*\s*{"ha-mode":"exactly","ha-params":{{ max_num_queues }},"ha-sync-mode":"automatic"}')
 
 - name: rabbitmq | _configure-ha-cluster | Set the RabbitMQ cluster name
   become: yes
